@@ -1,25 +1,49 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { crx, defineManifest } from '@crxjs/vite-plugin'
 import { resolve } from 'path'
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      input: {
-        background: resolve(__dirname, 'src/background/index.js'),
-        content: resolve(__dirname, 'src/content/index.js'),
-        sidepanel: resolve(__dirname, 'src/sidepanel/index.html'),
-        dashboard: resolve(__dirname, 'src/dashboard/index.html'),
-      },
-      output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name].[ext]',
-      },
-    },
-    outDir: 'dist',
-    emptyOutDir: true,
+const manifest = defineManifest({
+  manifest_version: 3,
+  name: "Job Application Tracker",
+  version: "1.0.0",
+  description: "Track your job applications automatically.",
+  permissions: [
+    "storage",
+    "activeTab",
+    "scripting",
+    "sidePanel"
+  ],
+  background: {
+    service_worker: "src/background/index.js",
+    type: "module"
   },
+  content_scripts: [
+    {
+      matches: ["<all_urls>"],
+      js: ["src/content/index.js"]
+    }
+  ],
+  side_panel: {
+    default_path: "src/sidepanel/index.html"
+  },
+  options_page: "src/dashboard/index.html",
+  action: {
+    default_title: "Open Job Tracker"
+  }
+})
+
+export default defineConfig({
+  plugins: [react(), crx({ manifest })],
+  server: {
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      port: 5173
+    }
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true
+  }
 })
