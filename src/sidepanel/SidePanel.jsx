@@ -86,7 +86,7 @@ export default function SidePanel() {
 
   return (
     <div className="p-2 w-full min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
-      <h1 className="text-xl font-bold mb-2 text-center">HuntMaster</h1>
+      <h1 className="text-xl font-bold mb-2 text-center bg-[url('/jigsaw.svg')] bg-contain">HuntMaster</h1>
       
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <button 
