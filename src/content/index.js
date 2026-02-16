@@ -93,21 +93,26 @@ if (!window.JOB_TRACKER_LOADED) {
 
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.action === 'SCRAPE_JOB') {
-            const hostname = window.location.hostname;
-            let data = {};
+            try {
+                const hostname = window.location.hostname;
+                let data = {};
 
-            if (hostname.includes('linkedin.com')) {
-                data = SCRAPERS['linkedin.com']();
-            } else if (hostname.includes('foorilla.com')) {
-                data = SCRAPERS['foorilla.com']();
+                if (hostname.includes('linkedin.com')) {
+                    data = SCRAPERS['linkedin.com']();
+                } else if (hostname.includes('foorilla.com')) {
+                    data = SCRAPERS['foorilla.com']();
+                }
+
+                // Fallback if specific scraping failed or not matched
+                if (!data.title) {
+                    data = { ...data, ...SCRAPERS['generic']() };
+                }
+
+                sendResponse(data);
+            } catch (error) {
+                console.error('Job Tracker Scraping Error:', error);
+                sendResponse({ error: error.message });
             }
-
-            // Fallback if specific scraping failed or not matched
-            if (!data.title) {
-                data = { ...data, ...SCRAPERS['generic']() };
-            }
-
-            sendResponse(data);
         }
         return true;
     });

@@ -27,9 +27,13 @@ const manifest = defineManifest({
   side_panel: {
     default_path: "src/sidepanel/index.html"
   },
-  options_page: "src/dashboard/index.html",
   action: {
     default_title: "Open Job Tracker"
+  },
+  icons: {
+    16: "icon.png",
+    48: "icon.png",
+    128: "icon.png"
   }
 })
 

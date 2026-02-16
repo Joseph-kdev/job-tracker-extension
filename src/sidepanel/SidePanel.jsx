@@ -31,16 +31,20 @@ export default function SidePanel() {
       } catch (e) {
         // If message fails, script might not be loaded. Try injecting it.
         console.log('Script not ready, injecting...', e);
+        
+        const manifest = chrome.runtime.getManifest();
+        const contentScript = manifest.content_scripts[0].js[0];
+
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
-          files: ['assets/content.js']
+          files: [contentScript]
         });
         // Wait a bit for script to initialize
         await new Promise(r => setTimeout(r, 500));
         response = await sendMessage();
       }
       
-      if (response) {
+      if (response && !response.error) {
         setJobDetails(prev => ({
           ...prev,
           title: response.title || prev.title,
@@ -51,7 +55,8 @@ export default function SidePanel() {
         }));
         setMessage('Page scanned successfully!');
       } else {
-        setMessage('Could not scrape page. Try refreshing the tab.');
+        const errorMsg = response?.error || 'Could not scrape page.';
+        setMessage(`${errorMsg} Try refreshing the tab.`);
       }
     } catch (error) {
       console.error('Scan error:', error);
